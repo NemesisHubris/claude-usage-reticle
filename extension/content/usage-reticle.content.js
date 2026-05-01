@@ -1,18 +1,3 @@
-// ==UserScript==
-// @name         Claude Usage Reticle
-// @namespace    https://github.com/NemesisHubris
-// @version      2.5
-// @description  Visual usage tracker showing time delta and percentage - see if you're OVER or UNDER budget
-// @author       NemesisHubris
-// @match        https://claude.ai/*
-// @icon         https://claude.ai/favicon.ico
-// @grant        none
-// @license      MIT
-// @homepageURL  https://github.com/NemesisHubris/claude-usage-reticle
-// @supportURL   https://github.com/NemesisHubris/claude-usage-reticle/issues
-// @run-at       document-idle
-// ==/UserScript==
-
 (function() {
     'use strict';
 
@@ -26,7 +11,7 @@
     var RETICLE_SELECTOR = '[' + ITEM_ATTR + '],.usage-reticle,.delta-reticle,.reticle-overlay,.reticle-glow';
     var STORAGE_KEY = 'claudeUsageReticleSettings';
     var EXTENSION_STORAGE_KEY = 'claudeUsageReticleExtensionSettings';
-    var EXTENSION_MODE = false;
+    var EXTENSION_MODE = true;
     var DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     var DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     var DAY_INDEX = {sun:0, mon:1, tue:2, wed:3, thu:4, fri:5, sat:6};
