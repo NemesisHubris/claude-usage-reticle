@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Claude Usage Reticle
 // @namespace    https://github.com/KatsuJinCode
-// @version      2.0
+// @version      2.1.0
 // @description  Visual usage tracker showing time delta and percentage - see if you're OVER or UNDER budget
 // @author       KatsuJinCode
 // @match        https://claude.ai/*
@@ -17,7 +17,7 @@
     'use strict';
 
     var style = document.createElement('style');
-    style.textContent = '.usage-reticle{position:absolute;width:2px;height:100%;background:#3b82f6;box-shadow:0 0 2px rgba(0,0,0,.5);pointer-events:none;z-index:10;top:0}.usage-reticle::after{content:"";position:absolute;left:-3px;bottom:-5px;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:5px solid #3b82f6}.usage-reticle-label{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);background:#3b82f6;color:#fff;padding:1px 4px;border-radius:2px;font-size:9px;font-weight:600;white-space:nowrap}.delta-reticle{position:absolute;width:2px;height:100%;box-shadow:0 0 2px rgba(0,0,0,.5);pointer-events:none;z-index:10;top:0}.delta-reticle::before{content:"";position:absolute;left:-3px;top:-5px;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent}.delta-reticle-label{position:absolute;top:-22px;left:50%;transform:translateX(-50%);padding:1px 4px;border-radius:2px;font-size:9px;font-weight:600;white-space:nowrap;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.9),0 0 4px rgba(0,0,0,0.7),0 0 8px rgba(0,0,0,0.4);border:1px solid #000}.reticle-overlay{position:absolute;height:100%;top:0;pointer-events:none;z-index:4;border-radius:4px}.reticle-glow{position:absolute;height:100%;top:0;pointer-events:none;z-index:3;border-radius:4px}';
+    style.textContent = '.usage-reticle{position:absolute;width:2px;height:100%;background:#3b82f6;box-shadow:0 0 2px rgba(0,0,0,.5);pointer-events:none;z-index:10;top:0}.usage-reticle::after{content:"";position:absolute;left:-3px;bottom:-5px;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:5px solid #3b82f6}.usage-reticle-label{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);background:#3b82f6;color:#fff;padding:1px 4px;border-radius:2px;font-size:9px;font-weight:600;white-space:nowrap}.delta-reticle{position:absolute;width:2px;height:100%;box-shadow:0 0 2px rgba(0,0,0,.5);pointer-events:none;z-index:10;top:0}.delta-reticle::before{content:"";position:absolute;left:-3px;top:-5px;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent}.delta-reticle-label{position:absolute;top:-22px;left:50%;transform:translateX(-50%);padding:1px 4px;border-radius:2px;font-size:9px;font-weight:600;white-space:nowrap;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.9),0 0 4px rgba(0,0,0,0.7),0 0 8px rgba(0,0,0,0.4);border:1px solid #000}.reticle-overlay{position:absolute;height:100%;top:0;pointer-events:none;z-index:4;border-radius:9999px}.reticle-glow{position:absolute;height:100%;top:0;pointer-events:none;z-index:3;border-radius:9999px}';
     document.head.appendChild(style);
 
     var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -60,16 +60,49 @@
         }
     }
 
+    function findBlock(bar) {
+        // Walk up from the progressbar to find an ancestor that contains
+        // a "Resets..." text node  -  that's the row block.
+        var node = bar.parentElement;
+        for (var depth = 0; depth < 10 && node; depth++) {
+            var spans = node.querySelectorAll('span');
+            for (var i = 0; i < spans.length; i++) {
+                if (/^\s*Resets/i.test(spans[i].textContent)) {
+                    return { block: node, resetEl: spans[i] };
+                }
+            }
+            node = node.parentElement;
+        }
+        return null;
+    }
+
+    function findTitle(block, resetEl) {
+        var spans = block.querySelectorAll('span');
+        for (var i = 0; i < spans.length; i++) {
+            var s = spans[i];
+            if (s === resetEl) continue;
+            var txt = s.textContent.trim();
+            if (!txt) continue;
+            if (/used\s*$/i.test(txt)) continue;
+            // Skip nested spans inside the reset element
+            if (resetEl.contains(s) || s.contains(resetEl)) continue;
+            return s;
+        }
+        return null;
+    }
+
     function addReticles() {
-        var containers = document.querySelectorAll('div.flex.flex-row.gap-x-8.justify-between.items-center');
+        var bars = document.querySelectorAll('div[role="progressbar"][aria-label="Usage"]');
         var added = 0;
 
-        containers.forEach(function(c) {
-            var p = c.querySelector('p.text-text-400.whitespace-nowrap');
-            if (!p) return;
-            var t = p.textContent;
+        bars.forEach(function(bar) {
+            var found = findBlock(bar);
+            if (!found) return;
+            var block = found.block;
+            var resetEl = found.resetEl;
+            var titleEl = findTitle(block, resetEl);
 
-            var titleEl = c.querySelector('p.text-text-100');
+            var t = resetEl.textContent;
             var isSession = titleEl && titleEl.textContent.toLowerCase().includes('current session');
             var windowHrs = isSession ? 5 : 168;
             var hrsUntil, reset;
@@ -98,14 +131,12 @@
 
             var nowPos = Math.max(0, Math.min(100, ((windowHrs - hrsUntil) / windowHrs) * 100));
 
-            var bar = c.querySelector('div.bg-bg-000.rounded.border.h-4');
-            if (!bar) return;
-
-            var fill = bar.querySelector('div');
-            var usagePos = 0;
-            if (fill) {
-                var w = fill.style.width;
-                if (w) usagePos = parseFloat(w);
+            // Read usage % from aria-valuenow (preferred) or fall back to inline style
+            var usagePos = parseFloat(bar.getAttribute('aria-valuenow'));
+            if (isNaN(usagePos)) {
+                var fill = bar.querySelector('div');
+                if (fill && fill.style.width) usagePos = parseFloat(fill.style.width);
+                else usagePos = 0;
             }
 
             var windowStart = new Date(reset.getTime() - windowHrs * 3600000);
@@ -121,6 +152,7 @@
             var raw = Math.min(Math.abs(diffPct) / 100 * 2, 1);
             var intensity = 0.35 + (1 - 0.35) * raw;
 
+            // The new bar uses overflow-hidden  -  we need overflow:visible so labels show
             bar.style.position = 'relative';
             bar.style.overflow = 'visible';
 
@@ -129,9 +161,7 @@
                 el.remove();
             });
 
-            // Add overlay/glow
             if (diffPct > 0) {
-                // Over budget - red glow + overlay
                 var glow = document.createElement('div');
                 glow.className = 'reticle-glow';
                 glow.style.left = nowPos + '%';
@@ -146,7 +176,6 @@
                 ov.style.background = 'hsla(0,' + (60 + intensity * 20) + '%,' + (40 - intensity * 10) + '%,' + (0.55 + intensity * 0.25) + ')';
                 bar.appendChild(ov);
             } else if (diffPct < 0) {
-                // Under budget - green overlay
                 var ov = document.createElement('div');
                 ov.className = 'reticle-overlay';
                 ov.style.left = usagePos + '%';
@@ -155,7 +184,6 @@
                 bar.appendChild(ov);
             }
 
-            // Delta reticle (at NOW position)
             var dr = document.createElement('div');
             dr.className = 'delta-reticle';
             dr.style.left = nowPos + '%';
@@ -172,7 +200,6 @@
             dr.appendChild(dlbl);
             bar.appendChild(dr);
 
-            // Usage reticle (at usage position)
             var ur = document.createElement('div');
             ur.className = 'usage-reticle';
             ur.style.left = usagePos + '%';
@@ -189,10 +216,8 @@
         return added;
     }
 
-    // Initial attempt
     var count = addReticles();
 
-    // Retry if nothing found (page still loading)
     if (count === 0) {
         var attempts = 0;
         var interval = setInterval(function() {
@@ -203,10 +228,8 @@
         }, 1000);
     }
 
-    // Auto-refresh every minute to keep positions current
     setInterval(addReticles, 60000);
 
-    // Watch for SPA navigation
     var lastUrl = location.href;
     new MutationObserver(function() {
         if (location.href !== lastUrl) {
