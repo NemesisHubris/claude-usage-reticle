@@ -166,7 +166,7 @@
     }
 
     function isUsagePage() {
-        return !!document.body && /claude\.ai/.test(location.hostname) && /\/settings\/usage/.test(location.pathname);
+        return !!document.body && /(?:^|\.)claude\.ai$/.test(location.hostname) && /\/settings\/usage/.test(location.pathname);
     }
 
     function injectStyles() {
@@ -174,7 +174,7 @@
         var style = document.createElement('style');
         style.setAttribute(STYLE_ATTR, 'true');
         style.textContent = '.usage-reticle{position:absolute;width:2px;height:100%;background:#3b82f6;box-shadow:0 0 2px rgba(0,0,0,.5);pointer-events:none;z-index:10;top:0}.usage-reticle::after{content:"";position:absolute;left:-3px;bottom:-5px;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:5px solid #3b82f6}.usage-reticle-label{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);background:#3b82f6;color:#fff;padding:1px 4px;border-radius:2px;font-size:9px;font-weight:600;white-space:nowrap}.delta-reticle{position:absolute;width:2px;height:100%;box-shadow:0 0 2px rgba(0,0,0,.5);pointer-events:none;z-index:10;top:0}.delta-reticle::before{content:"";position:absolute;left:-3px;top:-5px;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--reticle-arrow-color,#ef4444)}.delta-reticle-label{position:absolute;top:-22px;left:50%;transform:translateX(-50%);padding:1px 4px;border-radius:2px;font-size:9px;font-weight:600;white-space:nowrap;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.9),0 0 4px rgba(0,0,0,0.7),0 0 8px rgba(0,0,0,0.4);border:1px solid #000}.reticle-overlay{position:absolute;height:100%;top:0;pointer-events:none;z-index:4;border-radius:4px}.reticle-glow{position:absolute;height:100%;top:0;pointer-events:none;z-index:3;border-radius:4px}';
-        style.textContent += '.usage-reticle-settings{--reticle-panel-bg:rgba(255,250,242,.96);--reticle-panel-border:rgba(116,90,70,.28);--reticle-panel-text:#2f261f;--reticle-panel-muted:#6d5a4b;--reticle-panel-field:#fffaf2;--reticle-panel-field-border:rgba(116,90,70,.32);--reticle-panel-toggle:#7a4b2a;--reticle-panel-toggle-off:#8b8177;--reticle-panel-shadow:0 8px 22px rgba(55,38,24,.08);margin:0 0 16px;padding:12px 14px;border:1px solid var(--reticle-panel-border);border-radius:14px;background:var(--reticle-panel-bg);box-shadow:var(--reticle-panel-shadow);color:var(--reticle-panel-text);font:12px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:light}.usage-reticle-settings[data-reticle-theme="dark"]{--reticle-panel-bg:rgba(38,38,36,.94);--reticle-panel-border:rgba(255,255,255,.16);--reticle-panel-text:#f4f1ea;--reticle-panel-muted:#c9c1b6;--reticle-panel-field:rgba(20,20,19,.92);--reticle-panel-field-border:rgba(255,255,255,.22);--reticle-panel-toggle:#d2b48c;--reticle-panel-toggle-off:#6f6961;--reticle-panel-shadow:0 10px 28px rgba(0,0,0,.26);color-scheme:dark}.usage-reticle-settings button,.usage-reticle-settings input,.usage-reticle-settings select{font:inherit}.usage-reticle-settings__top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.usage-reticle-settings__title{font-weight:800;font-size:13px;color:var(--reticle-panel-text)}.usage-reticle-settings__summary{color:var(--reticle-panel-muted);margin-top:2px}.usage-reticle-settings__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:10px}.usage-reticle-settings__group{display:flex;flex-direction:column;gap:5px}.usage-reticle-settings__days{display:flex;flex-wrap:wrap;gap:6px}.usage-reticle-settings label{display:flex;align-items:center;gap:5px;color:var(--reticle-panel-text)}.usage-reticle-settings input[type="time"],.usage-reticle-settings select{border:1px solid var(--reticle-panel-field-border);border-radius:8px;background:var(--reticle-panel-field);color:var(--reticle-panel-text);padding:5px 7px}.usage-reticle-settings input[type="checkbox"]{accent-color:#60a5fa}.usage-reticle-settings__toggle{border:0;border-radius:999px;padding:7px 11px;background:var(--reticle-panel-toggle);color:#fffaf2;font-weight:800;cursor:pointer}.usage-reticle-settings[data-reticle-theme="dark"] .usage-reticle-settings__toggle{color:#241a12}.usage-reticle-settings__toggle[aria-pressed="false"]{background:var(--reticle-panel-toggle-off);color:#fffaf2}.usage-reticle-settings__time{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.usage-reticle-settings__hint{color:var(--reticle-panel-muted);font-size:11px}';
+        style.textContent += '.usage-reticle-settings{--reticle-panel-bg:rgba(255,250,242,.96);--reticle-panel-border:rgba(116,90,70,.28);--reticle-panel-text:#2f261f;--reticle-panel-muted:#6d5a4b;--reticle-panel-field:#fffaf2;--reticle-panel-field-border:rgba(116,90,70,.32);--reticle-panel-toggle:#7a4b2a;--reticle-panel-toggle-off:#8b8177;--reticle-panel-shadow:0 8px 22px rgba(55,38,24,.08);margin:0 0 16px;padding:12px 14px;border:1px solid var(--reticle-panel-border);border-radius:14px;background:var(--reticle-panel-bg);box-shadow:var(--reticle-panel-shadow);color:var(--reticle-panel-text);font:12px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color-scheme:light}.usage-reticle-settings[data-reticle-theme="dark"]{--reticle-panel-bg:rgba(38,38,36,.94);--reticle-panel-border:rgba(255,255,255,.16);--reticle-panel-text:#f4f1ea;--reticle-panel-muted:#c9c1b6;--reticle-panel-field:rgba(20,20,19,.92);--reticle-panel-field-border:rgba(255,255,255,.22);--reticle-panel-toggle:#d2b48c;--reticle-panel-toggle-off:#6f6961;--reticle-panel-shadow:0 10px 28px rgba(0,0,0,.26);color-scheme:dark}.usage-reticle-settings button,.usage-reticle-settings input,.usage-reticle-settings select{font:inherit}.usage-reticle-settings__top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.usage-reticle-settings__title{font-weight:800;font-size:13px;color:var(--reticle-panel-text)}.usage-reticle-settings__summary{color:var(--reticle-panel-muted);margin-top:2px}.usage-reticle-settings__grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:10px}.usage-reticle-settings__group{display:flex;flex-direction:column;gap:5px}.usage-reticle-settings__days{display:flex;flex-wrap:wrap;gap:6px}.usage-reticle-settings label{display:flex;align-items:center;gap:5px;color:var(--reticle-panel-text)}.usage-reticle-settings input[type="time"],.usage-reticle-settings select{border:1px solid var(--reticle-panel-field-border);border-radius:8px;background:var(--reticle-panel-field);color:var(--reticle-panel-text);padding:5px 7px}.usage-reticle-settings input[type="checkbox"]{accent-color:#60a5fa}.usage-reticle-settings__toggle{border:0;border-radius:999px;padding:7px 11px;background:var(--reticle-panel-toggle);color:#fffaf2;font-weight:800;cursor:pointer}.usage-reticle-settings[data-reticle-theme="dark"] .usage-reticle-settings__toggle{color:#241a12}.usage-reticle-settings__toggle[aria-pressed="false"]{background:var(--reticle-panel-toggle-off);color:#fffaf2}.usage-reticle-settings__time{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.usage-reticle-settings__hint{color:var(--reticle-panel-muted);font-size:11px}.day-boundary-reticle{position:absolute;width:2px;height:100%;background:rgba(116,90,70,.7);pointer-events:none;z-index:5;top:0}.hour-tick-reticle{position:absolute;width:1px;height:50%;bottom:0;background:rgba(116,90,70,.25);pointer-events:none;z-index:3}.day-boundary-label{position:absolute;bottom:-36px;transform:translateX(-50%);color:rgba(116,90,70,.7);font-size:9px;font-weight:700;letter-spacing:.02em;white-space:nowrap;pointer-events:none}';
         document.head.appendChild(style);
     }
 
@@ -636,6 +636,67 @@
         };
     }
 
+    function renderActiveWindowMarkers(bar, windowHours, resetInfo) {
+        if (windowHours !== 168) return;
+        if (!state.settings.activeWindowEnabled) return;
+
+        var settings = state.settings;
+        var end = resetInfo.reset;
+        var start = new Date(end.getTime() - windowHours * 3600000);
+        var totalActive = activeMillisBetween(start, end, settings);
+        if (totalActive <= 0) return;
+
+        var cumulativeBefore = 0;
+        var prevWasActive = false;
+        var day = startOfDay(start);
+        if (day.getTime() > start.getTime()) day.setDate(day.getDate() - 1);
+        var guard = 0;
+        while (day.getTime() < end.getTime() && guard < 14) {
+            var segs = getActiveSegmentsForDay(day, settings);
+            var dayActiveMs = 0;
+            for (var i = 0; i < segs.length; i++) {
+                var ovStart = Math.max(segs[i].start.getTime(), start.getTime());
+                var ovEnd = Math.min(segs[i].end.getTime(), end.getTime());
+                if (ovEnd > ovStart) dayActiveMs += ovEnd - ovStart;
+            }
+
+            if (dayActiveMs > 0) {
+                var startP = (cumulativeBefore / totalActive) * 100;
+                var endP = ((cumulativeBefore + dayActiveMs) / totalActive) * 100;
+
+                if (prevWasActive && startP > 0 && startP < 100) {
+                    var line = createItem('day-boundary-reticle');
+                    line.style.left = startP + '%';
+                    bar.appendChild(line);
+                }
+
+                var label = document.createElement('div');
+                label.className = 'day-boundary-label';
+                label.setAttribute(ITEM_ATTR, 'true');
+                label.style.left = ((startP + endP) / 2) + '%';
+                label.textContent = DAYS[day.getDay()];
+                bar.appendChild(label);
+
+                if (settings.activeHoursEnabled) {
+                    var hoursInDay = dayActiveMs / 3600000;
+                    for (var h = 1; h + 0.5 < hoursInDay; h++) {
+                        var hourPos = startP + (endP - startP) * (h / hoursInDay);
+                        var tick = createItem('hour-tick-reticle');
+                        tick.style.left = hourPos + '%';
+                        bar.appendChild(tick);
+                    }
+                }
+
+                cumulativeBefore += dayActiveMs;
+                prevWasActive = true;
+            } else {
+                prevWasActive = false;
+            }
+            day.setDate(day.getDate() + 1);
+            guard++;
+        }
+    }
+
     function renderBar(bar, windowHours, resetInfo, shortTime, useActiveWindow, row) {
         var usagePos = getUsagePercent(bar, row || bar);
         if (usagePos == null) return false;
@@ -669,6 +730,10 @@
             bar.style.position = 'relative';
         }
         bar.style.overflow = 'visible';
+
+        if (useActiveWindow) {
+            renderActiveWindowMarkers(bar, windowHours, resetInfo);
+        }
 
         if (diffPct > 0) {
             var glow = createItem('reticle-glow');

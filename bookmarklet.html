@@ -485,13 +485,13 @@
 
     var existing = window[ROOT_KEY];
     if (existing && existing.build === BUILD_ID && typeof existing.refresh === 'function') {
-        if (!/claude\.ai/.test(location.hostname)) console.warn("Go to claude.ai/settings/usage first!");
+        if (!/(?:^|\.)claude\.ai$/.test(location.hostname)) console.warn("Go to claude.ai/settings/usage first!");
         existing.refresh();
         return;
     }
     if (existing && typeof existing.destroy === 'function') existing.destroy();
 
-    if (!/claude\.ai/.test(location.hostname)) {
+    if (!/(?:^|\.)claude\.ai$/.test(location.hostname)) {
         console.warn("Go to claude.ai/settings/usage first!");
         return;
     }
@@ -753,7 +753,7 @@
     }
 
     function addReticles() {
-        if (!/claude\.ai/.test(location.hostname) || !/\/settings\/usage/.test(location.pathname)) {
+        if (!/(?:^|\.)claude\.ai$/.test(location.hostname) || !/\/settings\/usage/.test(location.pathname)) {
             return 0;
         }
         var added = 0;
