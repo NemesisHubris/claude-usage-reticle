@@ -134,6 +134,12 @@ The delta label color uses dynamic scaling:
 - Single NOW reticle showing current time position
 - Basic red marker with triangular arrows
 
+## Contributors
+
+- [KatsuJinCode](https://github.com/KatsuJinCode) - Original Author
+- [NemesisHubris](https://github.com/NemesisHubris)
+- [podfishapp](https://github.com/podfishapp)
+
 ## License
 
 MIT - Use it, share it, modify it.
