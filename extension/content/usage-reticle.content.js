@@ -647,7 +647,6 @@
         if (totalActive <= 0) return;
 
         var cumulativeBefore = 0;
-        var prevWasActive = false;
         var day = startOfDay(start);
         if (day.getTime() > start.getTime()) day.setDate(day.getDate() - 1);
         var guard = 0;
@@ -664,7 +663,7 @@
                 var startP = (cumulativeBefore / totalActive) * 100;
                 var endP = ((cumulativeBefore + dayActiveMs) / totalActive) * 100;
 
-                if (prevWasActive && startP > 0 && startP < 100) {
+                if (startP > 0 && startP < 100) {
                     var line = createItem('day-boundary-reticle');
                     line.style.left = startP + '%';
                     bar.appendChild(line);
@@ -688,9 +687,6 @@
                 }
 
                 cumulativeBefore += dayActiveMs;
-                prevWasActive = true;
-            } else {
-                prevWasActive = false;
             }
             day.setDate(day.getDate() + 1);
             guard++;
